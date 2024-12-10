@@ -1,0 +1,12 @@
+# Server settings
+server:
+  server-ip: "0.0.0.0"
+  server-port: 25565
+  online-mode: true
+  enable-status: true
+  log-ips: true
+  rate-limit: 0
+
+# Miscellaneous
+misc:
+  motd: "A Minecraft Server"
