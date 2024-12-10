@@ -6,42 +6,26 @@ import (
 )
 
 func SocketHandle(conn net.Conn) {
-	defer conn.Close()
+	var currentState State = Handshaking
 
-	// Parse the first VarInt
-	packetLength, err := readVarInt(conn)
-	if err != nil {
-		fmt.Println("Error reading packetLength VarInt:", err)
-		return
+	for {
+		// Parse the first VarInt
+		packetLength, err := readVarInt(conn)
+		if err != nil {
+			fmt.Println("Connection closed")
+			break
+		}
+
+		// Parse the second VarInt
+		id, err := readVarInt(conn)
+		if err != nil {
+			fmt.Println("Error reading id VarInt:", err)
+			break
+		}
+		fmt.Println("New Packet! - packetLength:", packetLength, "id:", id)
+
+		// Handle the packet
+		handlePacket(conn, &currentState, id)
+
 	}
-
-	// Parse the second VarInt
-	id, err := readVarInt(conn)
-	if err != nil {
-		fmt.Println("Error reading id VarInt:", err)
-		return
-	}
-
-	// Parse the second VarInt
-	protocolversion, err := readVarInt(conn)
-	if err != nil {
-		fmt.Println("Error reading PV VarInt:", err)
-		return
-	}
-
-	serverAdress := readString(conn)
-
-	serverPort, err := readShort(conn)
-	if err != nil {
-		fmt.Println("Error reading sp VarInt:", err)
-		return
-	}
-
-	nextState, err := readVarInt(conn)
-	if err != nil {
-		fmt.Println("Error reading NS VarInt:", err)
-		return
-	}
-
-	fmt.Println("Parsed VarInts - packetLength:", packetLength, "id:", id, "protocol version:", protocolversion, "server address:", serverAdress, "server port:", serverPort, "next state:", nextState)
 }

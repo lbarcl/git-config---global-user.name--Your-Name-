@@ -10,3 +10,7 @@ server:
 # Miscellaneous
 misc:
   motd: "A Minecraft Server"
+
+# Game settings
+game:
+  max-players: 20

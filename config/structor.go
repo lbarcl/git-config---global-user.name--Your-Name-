@@ -3,6 +3,7 @@ package config
 type Conf struct {
 	Server Server `yaml:"server"`
 	Misc   Misc   `yaml:"misc"`
+	Game   Game   `yaml:"game"`
 }
 
 type Server struct {
@@ -16,4 +17,8 @@ type Server struct {
 
 type Misc struct {
 	Motd string `yaml:"motd"`
+}
+
+type Game struct {
+	MaxPlayers int `yaml:"max-players"`
 }

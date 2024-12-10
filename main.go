@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"protocol"
+	"time"
 )
 
 func startServer(config config.Conf) {
@@ -15,17 +16,20 @@ func startServer(config config.Conf) {
 	}
 	defer server.Close()
 
-	fmt.Printf("[SERVER] started on %s \n", server.Addr())
+	fmt.Println("[SERVER]", time.Now().Format("02-01-2006 15:04:05"))
+	fmt.Println("[SERVER] MoGo, using 'server.yaml' as configuration file")
+	fmt.Println("[SERVER] Starting server at", server.Addr())
+	fmt.Println("[SERVER] Quit the server with CONTROL-C")
 
 	for {
-
 		socket, err := server.Accept()
+		fmt.Println("=====================================")
 		fmt.Println(socket.RemoteAddr())
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		protocol.SocketHandle(socket)
+		go protocol.SocketHandle(socket)
 	}
 
 }
