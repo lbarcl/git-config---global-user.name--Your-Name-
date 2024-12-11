@@ -2,30 +2,36 @@ package protocol
 
 import (
 	"fmt"
+	"helper"
 	"net"
 )
 
 func SocketHandle(conn net.Conn) {
-	var currentState State = Handshaking
+	var currentState helper.States = helper.Handshaking
 
 	for {
-		// Parse the first VarInt
-		packetLength, err := readVarInt(conn)
+		packet, err := GetPacket(conn)
 		if err != nil {
 			fmt.Println("Connection closed")
-			break
 		}
 
-		// Parse the second VarInt
-		id, err := readVarInt(conn)
-		if err != nil {
-			fmt.Println("Error reading id VarInt:", err)
+		fmt.Println("New Packet! - packetLength:", packet.length, "id:", packet.id)
+
+		switch currentState {
+		case helper.Handshaking:
+			// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Handshaking
+			HandleHandshake(&currentState, *packet)
+		case helper.Play:
+			fmt.Println("Unhandled Play state")
+		case helper.Status:
+			// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Status
+			HandleStatus(&currentState, *packet)
+		case helper.Login:
+			fmt.Println("Unhandled Login state")
+		}
+
+		if currentState == helper.Closed {
 			break
 		}
-		fmt.Println("New Packet! - packetLength:", packetLength, "id:", id)
-
-		// Handle the packet
-		handlePacket(conn, &currentState, id)
-
 	}
 }
