@@ -6,14 +6,7 @@ import (
 	"net"
 )
 
-type State uint8
 
-const (
-	Handshaking State = iota
-	Status
-	Login
-	Play
-)
 
 func handlePacket(conn net.Conn, state *State, id int) {
 
