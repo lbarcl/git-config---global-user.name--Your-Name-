@@ -7,5 +7,6 @@ const (
 	Status
 	Login
 	Play
+	Configuration
 	Closed
 )

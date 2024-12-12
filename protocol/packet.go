@@ -1,11 +1,9 @@
 package protocol
 
 import (
-	"encoding/hex"
 	"fmt"
 	"helper"
 	"net"
-	"strings"
 )
 
 type Packet struct {
@@ -53,24 +51,12 @@ func (packet *Packet) ReadString() string {
 	return helper.ReadString(*packet.sender)
 }
 
-func (packet *Packet) ReadUUID() (string, error) {
-	rawBytes := make([]byte, 16)
-	_, err := (*packet.sender).Read(rawBytes)
+func (packet *Packet) ReadUUID() string {
+	return helper.ReadUUID(*packet.sender)
+}
 
-	if err != nil {
-		return "", err
-	}
-
-	// Convert rawBytes to UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-	uuid := strings.Join([]string{
-		hex.EncodeToString(rawBytes[0:4]),
-		hex.EncodeToString(rawBytes[4:6]),
-		hex.EncodeToString(rawBytes[6:8]),
-		hex.EncodeToString(rawBytes[8:10]),
-		hex.EncodeToString(rawBytes[10:16]),
-	}, "-")
-
-	return uuid, nil
+func (packet *Packet) ReadBytes(length int) ([]byte, error) {
+	return helper.ReadBytes(*packet.sender, length)
 }
 
 func SendPacket(conn net.Conn, id int, data []byte) {

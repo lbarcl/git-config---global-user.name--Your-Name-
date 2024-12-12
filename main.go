@@ -36,6 +36,7 @@ func startServer(config config.Conf) {
 
 func main() {
 	serverConfig := config.ReadConfig()
+	config.GetEncryption()
 
 	startServer(serverConfig)
 }

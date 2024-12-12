@@ -21,3 +21,10 @@ func ReadString(conn net.Conn) string {
 
 	return string(rawBytes)
 }
+
+func WriteString(data string) []byte {
+	length := WriteVarInt(len(data))
+	rawBytes := append(length, []byte(data)...)
+
+	return rawBytes
+}

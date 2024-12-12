@@ -9,6 +9,8 @@ import (
 func SocketHandle(conn net.Conn) {
 	var currentState helper.States = helper.Handshaking
 
+	var currentPlayer helper.Player
+
 	for {
 		packet, err := GetPacket(conn)
 		if err != nil {
@@ -28,7 +30,10 @@ func SocketHandle(conn net.Conn) {
 			// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Status
 			HandleStatus(&currentState, *packet)
 		case helper.Login:
-			HandleLogin(&currentState, *packet)
+			HandleLogin(&currentState, *packet, &currentPlayer)
+		case helper.Configuration:
+			fmt.Println("Unhandled Configuration state")
+
 		}
 
 		if currentState == helper.Closed {
