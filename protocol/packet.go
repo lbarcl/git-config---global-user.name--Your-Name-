@@ -1,10 +1,11 @@
 package protocol
 
 import (
-	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"helper"
 	"net"
+	"strings"
 )
 
 type Packet struct {
@@ -61,14 +62,13 @@ func (packet *Packet) ReadUUID() (string, error) {
 	}
 
 	// Convert rawBytes to UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-	uuid := fmt.Sprintf(
-		"%08x-%04x-%04x-%04x-%012x",
-		binary.BigEndian.Uint32(rawBytes[0:4]),
-		binary.BigEndian.Uint16(rawBytes[4:6]),
-		binary.BigEndian.Uint16(rawBytes[6:8]),
-		binary.BigEndian.Uint16(rawBytes[8:10]),
-		binary.BigEndian.Uint64(rawBytes[10:16]),
-	)
+	uuid := strings.Join([]string{
+		hex.EncodeToString(rawBytes[0:4]),
+		hex.EncodeToString(rawBytes[4:6]),
+		hex.EncodeToString(rawBytes[6:8]),
+		hex.EncodeToString(rawBytes[8:10]),
+		hex.EncodeToString(rawBytes[10:16]),
+	}, "-")
 
 	return uuid, nil
 }

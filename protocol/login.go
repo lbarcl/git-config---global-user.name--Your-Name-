@@ -10,6 +10,6 @@ func HandleLogin(state *helper.States, packet Packet) {
 	case 0x00:
 		username := packet.ReadString()
 		uuid, _ := packet.ReadUUID()
-		fmt.Printf("[Server] %s joined with UUID of %s", username, uuid)
+		fmt.Printf("[Server] %s joined with UUID of %s\n", username, uuid)
 	}
 }
