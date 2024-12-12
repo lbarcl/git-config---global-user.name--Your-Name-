@@ -13,9 +13,10 @@ func SocketHandle(conn net.Conn) {
 		packet, err := GetPacket(conn)
 		if err != nil {
 			fmt.Println("Connection closed")
+			currentState = helper.Closed
+		} else {
+			fmt.Println("New Packet! - packetLength:", packet.length, "id:", packet.id)
 		}
-
-		fmt.Println("New Packet! - packetLength:", packet.length, "id:", packet.id)
 
 		switch currentState {
 		case helper.Handshaking:
