@@ -1,41 +1,52 @@
 package protocol
 
 import (
+	"config"
 	"fmt"
 	"helper"
 )
 
-func HandleLogin(state *helper.States, packet Packet, player *helper.Player) {
+func HandleLogin(conn *connection, packet *incommingPacket) {
 	switch packet.id {
 	case 0x00:
 		username := packet.ReadString()
 		uuid := packet.ReadUUID()
 
-		player.Username = username
-		player.UUID = uuid
+		conn.player.UUID = uuid
+		conn.player.Username = username
 
 		fmt.Printf("[Server] %s joined with UUID of %s\n", username, uuid)
 
-		rawBytes := []byte{}
+		if config.ReadConfig().Server.EnableCompression {
+			outComPacket := &outgouingPacket{
+				id: 0x03,
+			}
 
-		// Set the player UUID and username
-		rawBytes = append(rawBytes, helper.WriteUUID(player.UUID)...)
-		rawBytes = append(rawBytes, helper.WriteString(player.Username)...)
+			outComPacket.WriteVarInt(int(config.ReadConfig().Server.NetworkCompressionThreshold))
 
-		// Number of properties
-		rawBytes = append(rawBytes, helper.WriteVarInt(0)...)
+			conn.SendPacket(*outComPacket)
 
-		// Strict error handling
-		rawBytes = append(rawBytes, helper.WriteVarInt(0)...)
+			conn.compression = true
+		}
 
-		SendPacket(*packet.sender, 0x02, rawBytes)
-		fmt.Printf("[LoginSuccess] id: %d uuid: %s username: %s\n", packet.id, player.UUID, player.Username)
+		// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Login_Success
+		outPacket := &outgouingPacket{
+			id: 0x02,
+		}
+
+		outPacket.WriteUUID(uuid)
+		outPacket.WriteString(username)
+
+		outPacket.WriteVarInt(0) // Number of properties
+		outPacket.WriteVarInt(0) // Strict error
+
+		conn.SendPacket(*outPacket)
+		fmt.Printf("[LoginSuccess] id: %d uuid: %s username: %s\n", packet.id, uuid, username)
 
 	case 0x03:
 		// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Login_Acknowledged
 		// This packet switches the connection state to configuration.
-		*state = helper.Configuration
-		fmt.Printf("[LoginAck] id: %d uuid: %s username: %s\n", packet.id, player.UUID, player.Username)
+		conn.state = helper.Configuration
+		fmt.Printf("[LoginAck] id: %d uuid: %s username: %s\n", packet.id, conn.player.UUID, conn.player.Username)
 	}
-
 }

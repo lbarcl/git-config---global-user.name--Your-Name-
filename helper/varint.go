@@ -2,7 +2,7 @@ package helper
 
 import (
 	"fmt"
-	"net"
+	"io"
 )
 
 const (
@@ -12,14 +12,14 @@ const (
 
 // https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Data_types
 
-func ReadVarInt(conn net.Conn) (int, error) {
+func ReadVarInt(reader io.Reader) (int, error) {
 	value := 0
 	position := 0
 
 	for {
 		rawBytes := make([]byte, 1) // Adjust size based on expected data length
 
-		_, err := conn.Read(rawBytes)
+		_, err := reader.Read(rawBytes)
 		if err != nil {
 			return 0, err
 		}

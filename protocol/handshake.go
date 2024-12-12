@@ -5,7 +5,7 @@ import (
 	"helper"
 )
 
-func HandleHandshake(state *helper.States, packet Packet) {
+func HandleHandshake(conn *connection, packet *incommingPacket) {
 	switch packet.id {
 	case 0x00:
 		// Parse the second VarInt
@@ -16,8 +16,7 @@ func HandleHandshake(state *helper.States, packet Packet) {
 		}
 
 		if protocolversion != helper.ProtocolVersion {
-			(*packet.sender).Close()
-			*state = helper.Closed
+			conn.state = helper.Closed
 			break
 		}
 
@@ -37,7 +36,7 @@ func HandleHandshake(state *helper.States, packet Packet) {
 
 		fmt.Println("[Handshake]", "id:", packet.id, "protocol version:", protocolversion, "server address:", serverAdress, "server port:", serverPort, "next state:", nextState)
 
-		*state = helper.States(nextState)
+		conn.state = helper.States(nextState)
 
 	default:
 		fmt.Println("Unknown packet ID in Handshaking state:", packet.id)

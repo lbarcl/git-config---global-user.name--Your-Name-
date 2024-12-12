@@ -2,13 +2,13 @@ package helper
 
 import (
 	"encoding/hex"
-	"net"
+	"io"
 	"strings"
 )
 
-func ReadUUID(conn net.Conn) string {
+func ReadUUID(reader io.Reader) string {
 	rawBytes := make([]byte, 16)
-	_, err := conn.Read(rawBytes)
+	_, err := reader.Read(rawBytes)
 
 	if err != nil {
 		return ""
