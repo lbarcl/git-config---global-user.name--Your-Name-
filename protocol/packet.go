@@ -46,6 +46,16 @@ func (packet *incommingPacket) ReadBytes(length int) ([]byte, error) {
 	return helper.ReadBytes(packet.reader, length)
 }
 
+// ReadInt reads an int from the packet's sender.
+func (packet *incommingPacket) ReadInt() (int, error) {
+	return helper.ReadInt(packet.reader)
+}
+
+// Read all remaining bytes
+func (packet *incommingPacket) ReadAll() ([]byte, error) {
+	return io.ReadAll(packet.reader)
+}
+
 type outgouingPacket struct {
 	id   int
 	data []byte

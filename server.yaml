@@ -6,8 +6,8 @@ server:
   enable-status: true
   log-ips: true
   rate-limit: 0
-  enable-compression: true
-  network-copmression-limit: 60
+  # enable-compression: true
+  # network-copmression-limit: 60
 
 # Miscellaneous
 misc:

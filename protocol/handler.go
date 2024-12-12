@@ -19,7 +19,7 @@ func SocketHandle(socket net.Conn) {
 
 		if err != nil {
 			conn.state = helper.Closed
-			fmt.Printf("[SERVER] Client connection closed because of %w", err)
+			fmt.Printf("[SERVER] Client connection closed because of %s", err.Error())
 			break
 		}
 
@@ -35,7 +35,7 @@ func SocketHandle(socket net.Conn) {
 		case helper.Login:
 			HandleLogin(&conn, packet)
 		case helper.Configuration:
-			fmt.Println("Unhandled Configuration state")
+			HandleConfiguration(&conn, packet)
 		}
 
 		packet.Close()

@@ -61,7 +61,14 @@ func (conn *connection) GetPacket() (*incommingPacket, error) {
 				return nil, fmt.Errorf("failed to decompress paket: %w", err)
 			}
 
-			id, err := helper.ReadVarInt(reader)
+			decompressedData, err := io.ReadAll(reader)
+			if err != nil {
+				return nil, fmt.Errorf("failed to read decompressed data: %w", err)
+			}
+
+			decompressedBuffer := bytes.NewBuffer(decompressedData)
+
+			id, err := helper.ReadVarInt(decompressedBuffer)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read packet ID 2: %w", err)
 			}
