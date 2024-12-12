@@ -1,6 +1,7 @@
 package protocol
 
 import (
+	"encoding/binary"
 	"fmt"
 	"helper"
 	"net"
@@ -49,6 +50,27 @@ func (packet *Packet) ReadLong() (int64, error) {
 
 func (packet *Packet) ReadString() string {
 	return helper.ReadString(*packet.sender)
+}
+
+func (packet *Packet) ReadUUID() (string, error) {
+	rawBytes := make([]byte, 16)
+	_, err := (*packet.sender).Read(rawBytes)
+
+	if err != nil {
+		return "", err
+	}
+
+	// Convert rawBytes to UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+	uuid := fmt.Sprintf(
+		"%08x-%04x-%04x-%04x-%012x",
+		binary.BigEndian.Uint32(rawBytes[0:4]),
+		binary.BigEndian.Uint16(rawBytes[4:6]),
+		binary.BigEndian.Uint16(rawBytes[6:8]),
+		binary.BigEndian.Uint16(rawBytes[8:10]),
+		binary.BigEndian.Uint64(rawBytes[10:16]),
+	)
+
+	return uuid, nil
 }
 
 func SendPacket(conn net.Conn, id int, data []byte) {

@@ -27,7 +27,7 @@ func SocketHandle(conn net.Conn) {
 			// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Status
 			HandleStatus(&currentState, *packet)
 		case helper.Login:
-			fmt.Println("Unhandled Login state")
+			HandleLogin(&currentState, *packet)
 		}
 
 		if currentState == helper.Closed {
