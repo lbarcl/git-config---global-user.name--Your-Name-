@@ -100,6 +100,7 @@ func (conn *connection) GetPacket() (*incommingPacket, error) {
 		id:     id,
 		length: length,
 		reader: reader,
+		offset: helper.VarIntByteLength(id) + helper.VarIntByteLength(length),
 	}
 
 	return packet, nil

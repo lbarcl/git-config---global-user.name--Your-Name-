@@ -8,6 +8,7 @@ import (
 type incommingPacket struct {
 	id     int
 	length int
+	offset int
 	reader io.ReadCloser
 }
 
@@ -18,7 +19,12 @@ func (packet *incommingPacket) Close() error {
 
 // ReadVarInt reads a VarInt from the packet's reader or socket.
 func (packet *incommingPacket) ReadVarInt() (int, error) {
-	return helper.ReadVarInt(packet.reader)
+	value, err := helper.ReadVarInt(packet.reader)
+	if err != nil {
+		return 0, err
+	}
+	packet.offset += helper.VarIntByteLength(value)
+	return value, nil
 }
 
 // ReadShort reads a short (uint16) from the packet's sender.
@@ -33,7 +39,9 @@ func (packet *incommingPacket) ReadLong() (int64, error) {
 
 // ReadString reads a string from the packet's sender.
 func (packet *incommingPacket) ReadString() string {
-	return helper.ReadString(packet.reader)
+	str := helper.ReadString(packet.reader)
+	packet.offset += len([]byte(str))
+	return str
 }
 
 // ReadUUID reads a UUID string from the packet's sender.
@@ -43,12 +51,21 @@ func (packet *incommingPacket) ReadUUID() string {
 
 // ReadBytes reads a byte slice of the given length from the packet's sender.
 func (packet *incommingPacket) ReadBytes(length int) ([]byte, error) {
-	return helper.ReadBytes(packet.reader, length)
+	bytes, err := helper.ReadBytes(packet.reader, length)
+	packet.offset += length
+	return bytes, err
 }
 
 // ReadInt reads an int from the packet's sender.
 func (packet *incommingPacket) ReadInt() (int, error) {
 	return helper.ReadInt(packet.reader)
+}
+
+// ReadBoolean reads a boolean from the packet's sender.
+func (packet *incommingPacket) ReadBoolean() (bool, error) {
+	boolean, err := helper.ReadBoolean(packet.reader)
+	packet.offset++
+	return boolean, err
 }
 
 // Read all remaining bytes
