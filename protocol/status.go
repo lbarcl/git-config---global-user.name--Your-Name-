@@ -6,23 +6,19 @@ import (
 	"helper"
 )
 
-func HandleStatus(state *helper.States, packet Packet) {
+func HandleStatus(conn *connection, packet *incommingPacket) {
 	switch packet.id {
 	case 0x00:
 		// Get the config
 		config := config.ReadConfig()
 
-		// Raw JSON response
-		response := []byte(fmt.Sprintf(`{"version":{"name":"1.21.1","protocol":767},"players":{"max":%d,"online":0},"description":"%s"}`, config.Game.MaxPlayers, config.Misc.Motd))
+		outPacket := &outgouingPacket{
+			id: 0x00,
+		}
 
-		// length of the response
-		responseLength := helper.WriteVarInt(len(response))
+		outPacket.WriteString(fmt.Sprintf(`{"version":{"name":"1.21.1","protocol":767},"players":{"max":%d,"online":0},"description":"%s"}`, config.Game.MaxPlayers, config.Misc.Motd))
 
-		// Combine the length and the response
-		responseData := append(responseLength, response...)
-
-		// Send response
-		SendPacket(*packet.sender, 0x00, responseData)
+		conn.SendPacket(*outPacket)
 
 		fmt.Println("[Status]", "id:", packet.id)
 
@@ -34,12 +30,17 @@ func HandleStatus(state *helper.States, packet Packet) {
 			break
 		}
 
-		// Send the pong packet
-		SendPacket(*packet.sender, 0x01, helper.WriteLong(payload))
+		outPacket := &outgouingPacket{
+			id: 0x01,
+		}
+
+		outPacket.WriteLong(payload)
+
+		conn.SendPacket(*outPacket)
 
 		fmt.Println("[Status]", "id:", packet.id, "payload:", payload)
 
-		*state = helper.Closed
+		conn.state = helper.Closed
 
 	default:
 		fmt.Println("Unknown packet ID in Status state:", packet.id)

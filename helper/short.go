@@ -1,11 +1,13 @@
 package helper
 
-import "net"
+import (
+	"io"
+)
 
-func ReadShort(conn net.Conn) (uint16, error) {
+func ReadShort(reader io.Reader) (uint16, error) {
 	rawBytes := make([]byte, 2) // Expecting 2 bytes for an unsigned short
 
-	_, err := conn.Read(rawBytes)
+	_, err := reader.Read(rawBytes)
 	if err != nil {
 		return 0, err
 	}

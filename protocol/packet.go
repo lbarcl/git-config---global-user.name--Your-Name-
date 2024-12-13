@@ -1,81 +1,82 @@
 package protocol
 
 import (
-	"fmt"
 	"helper"
-	"net"
+	"io"
 )
 
-type Packet struct {
+type incommingPacket struct {
 	id     int
 	length int
-	sender *net.Conn
+	reader io.ReadCloser
 }
 
-func GetPacket(socket net.Conn) (*Packet, error) {
-	// Read the total packet length
-	length, err := helper.ReadVarInt(socket)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read packet length: %w", err)
-	}
-
-	// Read the packet ID
-	id, err := helper.ReadVarInt(socket)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read packet ID: %w", err)
-	}
-
-	// Construct and return the packet
-	packet := &Packet{
-		id:     id,
-		length: length,
-		sender: &socket,
-	}
-
-	return packet, nil
+// Close ensures the packet's reader is closed properly.
+func (packet *incommingPacket) Close() error {
+	return packet.reader.Close()
 }
 
-func (packet *Packet) ReadVarInt() (int, error) {
-	return helper.ReadVarInt(*packet.sender)
+// ReadVarInt reads a VarInt from the packet's reader or socket.
+func (packet *incommingPacket) ReadVarInt() (int, error) {
+	return helper.ReadVarInt(packet.reader)
 }
 
-func (packet *Packet) ReadShort() (uint16, error) {
-	return helper.ReadShort(*packet.sender)
+// ReadShort reads a short (uint16) from the packet's sender.
+func (packet *incommingPacket) ReadShort() (uint16, error) {
+	return helper.ReadShort(packet.reader)
 }
 
-func (packet *Packet) ReadLong() (int64, error) {
-	return helper.ReadLong(*packet.sender)
+// ReadLong reads a long (int64) from the packet's sender.
+func (packet *incommingPacket) ReadLong() (int64, error) {
+	return helper.ReadLong(packet.reader)
 }
 
-func (packet *Packet) ReadString() string {
-	return helper.ReadString(*packet.sender)
+// ReadString reads a string from the packet's sender.
+func (packet *incommingPacket) ReadString() string {
+	return helper.ReadString(packet.reader)
 }
 
-func (packet *Packet) ReadUUID() string {
-	return helper.ReadUUID(*packet.sender)
+// ReadUUID reads a UUID string from the packet's sender.
+func (packet *incommingPacket) ReadUUID() string {
+	return helper.ReadUUID(packet.reader)
 }
 
-func (packet *Packet) ReadBytes(length int) ([]byte, error) {
-	return helper.ReadBytes(*packet.sender, length)
+// ReadBytes reads a byte slice of the given length from the packet's sender.
+func (packet *incommingPacket) ReadBytes(length int) ([]byte, error) {
+	return helper.ReadBytes(packet.reader, length)
 }
 
-func SendPacket(conn net.Conn, id int, data []byte) {
+// ReadInt reads an int from the packet's sender.
+func (packet *incommingPacket) ReadInt() (int, error) {
+	return helper.ReadInt(packet.reader)
+}
 
-	// Write the packet ID as a VarInt
-	packetIdEncoded := helper.WriteVarInt(id)
+// Read all remaining bytes
+func (packet *incommingPacket) ReadAll() ([]byte, error) {
+	return io.ReadAll(packet.reader)
+}
 
-	// Append the packet ID to the data
-	packetData := append(packetIdEncoded, data...)
+type outgouingPacket struct {
+	id   int
+	data []byte
+}
 
-	// Write the length of the packet data as a VarInt
-	packetLength := helper.WriteVarInt(len(packetData))
+func (packet *outgouingPacket) WriteVarInt(data int) {
+	packet.data = append(packet.data, helper.WriteVarInt(data)...)
+}
 
-	// Combine the packet length and the packet data
-	packet := append(packetLength, packetData...)
+func (packet *outgouingPacket) WriteShort(data int16) {
+	packet.data = append(packet.data, byte(data))
+}
 
-	// Send the packet
-	_, err := conn.Write(packet)
-	if err != nil {
-		fmt.Println("Error sending packet:", err)
-	}
+func (packet *outgouingPacket) WriteLong(data int64) {
+	packet.data = append(packet.data, helper.WriteLong(data)...)
+}
+
+func (packet *outgouingPacket) WriteString(data string) {
+	packet.data = append(packet.data, helper.WriteString(data)...)
+}
+
+func (packet *outgouingPacket) WriteUUID(uuid string) {
+	packet.data = append(packet.data, helper.WriteUUID(uuid)...)
 }

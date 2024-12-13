@@ -7,12 +7,14 @@ type Conf struct {
 }
 
 type Server struct {
-	Ip        string `yaml:"server-ip"`
-	Port      uint16 `yaml:"server-port"`
-	Online    bool   `yaml:"online-mode"`
-	Status    bool   `yaml:"enable-status"`
-	LogIPs    bool   `yaml:"log-ips"`
-	RateLimit uint32 `yaml:"rate-limit"`
+	Ip                          string `yaml:"server-ip"`
+	Port                        uint16 `yaml:"server-port"`
+	Online                      bool   `yaml:"online-mode"`
+	Status                      bool   `yaml:"enable-status"`
+	LogIPs                      bool   `yaml:"log-ips"`
+	RateLimit                   uint32 `yaml:"rate-limit"`
+	NetworkCompressionThreshold uint   `yaml:"network-compression-threshold"`
+	EnableCompression           bool   `yaml:"enable-compression"`
 }
 
 type Misc struct {

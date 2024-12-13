@@ -1,11 +1,13 @@
 package helper
 
-import "net"
+import (
+	"io"
+)
 
-func ReadBytes(conn net.Conn, length int) ([]byte, error) {
+func ReadBytes(reader io.Reader, length int) ([]byte, error) {
 	rawBytes := make([]byte, length)
 
-	_, err := conn.Read(rawBytes)
+	_, err := reader.Read(rawBytes)
 	if err != nil {
 		return nil, err
 	}

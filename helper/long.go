@@ -1,11 +1,13 @@
 package helper
 
-import "net"
+import (
+	"io"
+)
 
-func ReadLong(conn net.Conn) (int64, error) {
+func ReadLong(reader io.Reader) (int64, error) {
 	rawBytes := make([]byte, 8) // Expecting 8 bytes for a long
 
-	_, err := conn.Read(rawBytes)
+	_, err := reader.Read(rawBytes)
 	if err != nil {
 		return 0, err
 	}
