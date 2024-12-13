@@ -51,6 +51,11 @@ func (packet *incommingPacket) ReadInt() (int, error) {
 	return helper.ReadInt(packet.reader)
 }
 
+// ReadBoolean reads a boolean from the packet's sender.
+func (packet *incommingPacket) ReadBoolean() (bool, error) {
+	return helper.ReadBoolean(packet.reader)
+}
+
 // Read all remaining bytes
 func (packet *incommingPacket) ReadAll() ([]byte, error) {
 	return io.ReadAll(packet.reader)
