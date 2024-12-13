@@ -16,6 +16,7 @@ type connection struct {
 	player      helper.Player
 	compression bool
 	encrypted   bool
+	protocolVersion int
 }
 
 func (conn *connection) GetPacket() (*incommingPacket, error) {

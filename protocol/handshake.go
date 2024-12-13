@@ -15,10 +15,7 @@ func HandleHandshake(conn *connection, packet *incommingPacket) {
 			break
 		}
 
-		if protocolversion != helper.ProtocolVersion {
-			conn.state = helper.Closed
-			break
-		}
+		conn.protocolVersion = protocolversion
 
 		serverAdress := packet.ReadString()
 

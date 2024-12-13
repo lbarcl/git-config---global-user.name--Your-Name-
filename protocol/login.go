@@ -17,6 +17,20 @@ func HandleLogin(conn *connection, packet *incommingPacket) {
 
 		fmt.Printf("[Server] %s joined with UUID of %s\n", username, uuid)
 
+		if conn.protocolVersion != helper.ProtocolVersion {
+
+			p := outgouingPacket{
+				id: 0x00,
+			}
+
+			p.WriteString("{\"text\": \"Sürüm uyuşmuyor yav\" }")
+
+			conn.SendPacket(p)
+
+			conn.state = helper.Closed
+			break
+		}
+
 		if config.ReadConfig().Server.EnableCompression {
 			outComPacket := &outgouingPacket{
 				id: 0x03,
