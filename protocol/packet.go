@@ -97,3 +97,19 @@ func (packet *outgouingPacket) WriteString(data string) {
 func (packet *outgouingPacket) WriteUUID(uuid string) {
 	packet.data = append(packet.data, helper.WriteUUID(uuid)...)
 }
+
+func (packet *outgouingPacket) WriteByte(data byte) {
+	packet.data = append(packet.data, data)
+}
+
+func (packet *outgouingPacket) WriteSByte(data int8) {
+	packet.data = append(packet.data, byte(data))
+}
+
+func (packet *outgouingPacket) WriteDouble(data float64) {
+	packet.data = append(packet.data, helper.DoubleToBytes(data)...)
+}
+
+func (packet *outgouingPacket) WriteFloat(data float32) {
+	packet.data = append(packet.data, helper.FloatToBytes(data)...)
+}
