@@ -23,7 +23,7 @@ func ReadString(reader io.Reader) string {
 }
 
 func WriteString(data string) []byte {
-	length := WriteVarInt(len(data))
+	length := WriteVarInt(int32(len(data)))
 	rawBytes := append(length, []byte(data)...)
 
 	return rawBytes

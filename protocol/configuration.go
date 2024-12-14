@@ -27,7 +27,7 @@ func HandleConfiguration(conn *connection, packet *incommingPacket) {
 	case 0x02:
 
 		channel := packet.ReadString()
-		data, _ := packet.ReadBytes(packet.length - packet.offset)
+		data, _ := packet.ReadBytes(int(packet.length) - packet.offset)
 
 		fmt.Println("[ConfCustomPayload]", "id:", packet.id, "channel:", string(channel), "data:", string(data), "length:", len(data))
 

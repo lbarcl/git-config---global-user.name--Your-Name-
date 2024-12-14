@@ -36,7 +36,7 @@ func HandleLogin(conn *connection, packet *incommingPacket) {
 				id: 0x03,
 			}
 
-			outComPacket.WriteVarInt(int(config.ReadConfig().Server.NetworkCompressionThreshold))
+			outComPacket.WriteVarInt(int32(config.ReadConfig().Server.NetworkCompressionThreshold))
 
 			conn.SendPacket(*outComPacket)
 

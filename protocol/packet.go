@@ -6,8 +6,8 @@ import (
 )
 
 type incommingPacket struct {
-	id     int
-	length int
+	id     int32
+	length int32
 	offset int
 	reader io.ReadCloser
 }

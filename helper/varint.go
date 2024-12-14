@@ -69,7 +69,7 @@ func WriteVarInt(value int32) []byte {
 	return buf.Bytes()
 }
 
-func VarIntByteLength(value int) int {
+func VarIntByteLength(value int32) int {
 	length := 0
 	for {
 		length++
