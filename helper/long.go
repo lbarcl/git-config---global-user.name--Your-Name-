@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"bytes"
 	"io"
 )
 
@@ -17,14 +18,29 @@ func ReadLong(reader io.Reader) (int64, error) {
 }
 
 func WriteLong(value int64) []byte {
-	return []byte{
-		byte(value >> 56),
-		byte(value >> 48),
-		byte(value >> 40),
-		byte(value >> 32),
-		byte(value >> 24),
-		byte(value >> 16),
-		byte(value >> 8),
-		byte(value),
+	buf := &bytes.Buffer{}
+	val := uint64(value)
+	const maxBytes = 10 // Minecraft protokolünde VarInt maksimum boyut
+	for i := 0; i < maxBytes; i++ {
+		// İlk 7 bitlik kısmı al
+		b := byte(val) & 0b01111111
+
+		// İşaretli kaydırma işlemi: sağa doğru kaydır ve işareti koru
+		val >>= 7
+
+		// Eğer hala verimiz varsa veya negatif değerle uğraşıyorsak devam biti ekle
+		if val != 0 {
+			b |= 0b10000000
+		}
+
+		// Baytı buffer'a yaz
+		buf.WriteByte(b)
+
+		// Eğer devam biti (`MSB`) set değilse işlem biter
+		if val == 0 {
+			break
+		}
 	}
+
+	return buf.Bytes()
 }

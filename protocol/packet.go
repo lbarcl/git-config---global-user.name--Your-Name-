@@ -18,7 +18,7 @@ func (packet *incommingPacket) Close() error {
 }
 
 // ReadVarInt reads a VarInt from the packet's reader or socket.
-func (packet *incommingPacket) ReadVarInt() (int, error) {
+func (packet *incommingPacket) ReadVarInt() (int32, error) {
 	value, err := helper.ReadVarInt(packet.reader)
 	if err != nil {
 		return 0, err
@@ -74,11 +74,11 @@ func (packet *incommingPacket) ReadAll() ([]byte, error) {
 }
 
 type outgouingPacket struct {
-	id   int
+	id   int32
 	data []byte
 }
 
-func (packet *outgouingPacket) WriteVarInt(data int) {
+func (packet *outgouingPacket) WriteVarInt(data int32) {
 	packet.data = append(packet.data, helper.WriteVarInt(data)...)
 }
 
